@@ -6,9 +6,15 @@ from .schemas import LocationSchema
 from ninja.security import HttpBearer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import InvalidToken
-
+import os
+import csv
+import io
 from .schemas import UserRegisterSchema, UserLoginSchema, TokenSchema, TokenRefreshSchema
 from .serializers import get_tokens_for_user, refresh_access_token
+from scraper.scraper import main as scrape_main
+import logging
+logger = logging.getLogger(__name__)
+
 
 apiauth = NinjaAPI(version="1.0")
 data = NinjaAPI(version="2.0")
@@ -162,3 +168,31 @@ def get_last_location(request):
             "message": "No locations found for this user"
         }
 
+@apiauth.post("/scrape-data", auth=auth, response={200: dict, 400: dict, 401: dict})
+def scrape_data(request):
+
+    output_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'scraper', 'passes_extended.csv')
+    output_file = os.path.normpath(output_file)
+
+    logger.debug(f"Output CSV path: {output_file}")
+
+    try:
+        data_list = scrape_main(output_file=output_file, browser='chrome')
+    except Exception as e:
+        logger.error(f"Scraping failed: {e}", exc_info=True)
+        return 400, {"error": f"Scraping failed: {str(e)}"}
+
+    if not data_list:
+        logger.warning("Scraper returned no data.")
+        return 400, {"error": "Scraper returned no data."}
+
+    formatted_data = {}
+    for index, entry in enumerate(data_list, start=1):
+        formatted_data[str(index)] = {
+            "start": entry.get("Start Date and Time", ""),
+            "end": entry.get("End Local Time", "")
+        }
+
+    logger.debug("Data formatted successfully.")
+
+    return 200, {"data": formatted_data}
