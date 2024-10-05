@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import { Inter, Pacifico } from 'next/font/google';
 
 import { ThemeProvider } from '@/components/shared/theme-provider';
+import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
   title: 'Landwatch',
@@ -35,6 +36,7 @@ const RootLayout = ({ children }: PropsWithChildren) => {
           disableTransitionOnChange
         >
           {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

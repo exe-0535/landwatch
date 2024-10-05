@@ -1,8 +1,10 @@
 'use client';
+
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
+import { authAction } from '@/actions/actions';
 import { Icons } from '@/components/shared/icons';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,11 +16,13 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
 
 const defaultValues = {
   email: '',
   password: '',
 };
+
 const authFormSchema = z.object({
   email: z.string().min(1, 'Email field is required').email(),
   password: z
@@ -31,15 +35,32 @@ const authFormSchema = z.object({
       'Password must contain one lowercase, one uppercase letter, a number, or a special character'
     ),
 });
+
 type TAuthFormSchema = z.infer<typeof authFormSchema>;
-export const AuthForm = () => {
+
+type AuthFormProps = {
+  isSignUp: boolean;
+};
+
+export const AuthForm = ({ isSignUp }: AuthFormProps) => {
   const form = useForm<TAuthFormSchema>({
     resolver: zodResolver(authFormSchema),
     defaultValues,
   });
+  const { toast } = useToast();
+
   const onSubmit = async (values: TAuthFormSchema) => {
-    console.log(values);
+    const error = await authAction(isSignUp, values);
+
+    if (!error) return;
+
+    toast({
+      variant: 'destructive',
+      title: 'Oops! Something went wrong.',
+      description: error.error,
+    });
   };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-sm">

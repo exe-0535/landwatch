@@ -29,7 +29,7 @@ const AuthPage = ({ params }: { params: { slug: string } }) => {
             ? ' Enter your credentials below to create your account'
             : 'Enter your credentials below to login to your account'}
         </p>
-        <AuthForm />
+        <AuthForm isSignUp={isSignUp} />
         {isSignUp ? (
           <p className="mt-3 text-center">
             Already have an account?{' '}
