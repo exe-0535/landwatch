@@ -7,19 +7,48 @@ from ninja.security import HttpBearer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import InvalidToken
 import os
-import csv
-import io
+import pytz
+import time
 from .schemas import UserRegisterSchema, UserLoginSchema, TokenSchema, TokenRefreshSchema
 from .serializers import get_tokens_for_user, refresh_access_token
 from scraper.scraper import main as scrape_main
 import logging
 logger = logging.getLogger(__name__)
-
+from apscheduler.schedulers.background import BackgroundScheduler
+from smtp.utils import send_notification_email
+from datetime import datetime, timedelta, timezone as tz
+from django.utils import timezone
+from .scheduler import scheduler 
 
 apiauth = NinjaAPI(version="1.0")
 data = NinjaAPI(version="2.0")
 
+scheduler = BackgroundScheduler()
 
+def schedule_email(user_email, start_time):
+    if timezone.is_naive(start_time):
+        start_time = timezone.make_aware(start_time, timezone=tz.utc)
+    
+    if start_time < timezone.now():
+        logger.warning(f"Start time {start_time} is in the past. Skipping email scheduling for {user_email}.")
+        return
+    
+    job_id = f"{user_email}_{start_time.isoformat()}"
+    try:
+        scheduler.add_job(
+            send_notification_email,
+            'date',
+            run_date=start_time,
+            args=[user_email],
+            id=job_id,
+            replace_existing=True
+        )
+        logger.info(f"Email scheduled for {user_email} at {start_time} for location")
+    except Exception as e:
+        logger.error(f"Failed to schedule email for {user_email} at {start_time}: {e}", exc_info=True)
+
+    print(f"Email scheduled for {user_email} at {start_time} for location")
+ 
 class AuthBearer(HttpBearer):
     def authenticate(self, request, token):
         jwt_auth = JWTAuthentication()
@@ -103,8 +132,8 @@ def get_me(request, payload: TokenSchema):
 
 
 @data.post("/get-landsat-image")
-def get_landsat_image(request, path: int, grid: int):
-    # get path/grid data from user
+def get_landsat_image(request):
+
     return "Hello world"
 
 @apiauth.get("/me", auth=auth, response={200: dict, 401: dict})
@@ -168,8 +197,33 @@ def get_last_location(request):
             "message": "No locations found for this user"
         }
 
+
+def process_scraped_data(user_email, data_list):
+    current_year = datetime.now().year
+    for entry in data_list:
+        start_time_str = entry.get("Start Date and Time", "")
+        try:
+            full_start_time_str = f"{start_time_str} {current_year}"
+            start_time = datetime.strptime(full_start_time_str, "%d-%b %H:%M %Y")
+        except ValueError as ve:
+            logger.error(f"Date parsing error for '{start_time_str}': {ve}")
+            continue
+
+        schedule_email(user_email, start_time)
+    warsaw_tz = pytz.timezone('Europe/Warsaw')
+    current_time = datetime.now(warsaw_tz)
+    schedule_email("boomero455@gmail.com", current_time + timedelta(seconds=5))
+    scheduler.start()
+
+
 @apiauth.post("/scrape-data", auth=auth, response={200: dict, 400: dict, 401: dict})
 def scrape_data(request):
+
+    auth_header = request.headers.get("Authorization")
+    
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header.split(" ")[1]
+        user = auth.authenticate(request, token)
 
     output_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'scraper', 'passes_extended.csv')
     output_file = os.path.normpath(output_file)
@@ -185,6 +239,8 @@ def scrape_data(request):
     if not data_list:
         logger.warning("Scraper returned no data.")
         return 400, {"error": "Scraper returned no data."}
+
+    process_scraped_data(user.email, data_list)
 
     formatted_data = {}
     for index, entry in enumerate(data_list, start=1):

@@ -8,3 +8,5 @@ psycopg2-binary
 selenium
 beautifulsoup4
 requests
+apscheduler
+pytz
