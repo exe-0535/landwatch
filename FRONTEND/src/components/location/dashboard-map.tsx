@@ -16,26 +16,26 @@ type SatellitePosition = {
 };
 
 const fetchTLEData = async () => {
-  const response = await fetch(
-    'https://celestrak.com/NORAD/elements/resource.txt'
+  const landsat8Response = await fetch(
+    'https://celestrak.org/NORAD/elements/gp.php?CATNR=39084'
+  );
+  const landsat9Response = await fetch(
+    'https://celestrak.org/NORAD/elements/gp.php?CATNR=49260'
   );
 
-  const data = await response.text();
+  const landsat8Data = await landsat8Response.text();
+  const landsat9Data = await landsat9Response.text();
 
-  const lines = data.split('\n');
-  const tleData = [];
+  const parseTLE = (data: string) => {
+    const lines = data.split('\n');
+    return {
+      name: lines[0]?.trim(),
+      line1: lines[1]?.trim(),
+      line2: lines[2]?.trim(),
+    };
+  };
 
-  for (let i = 0; i < lines.length; i += 3) {
-    const name = lines[i]?.trim();
-    const line1 = lines[i + 1]?.trim();
-    const line2 = lines[i + 2]?.trim();
-
-    if (name && line1 && line2) {
-      if (name === 'LANDSAT 8' || name === 'LANDSAT 9') {
-        tleData.push({ name, line1, line2 });
-      }
-    }
-  }
+  const tleData = [parseTLE(landsat8Data), parseTLE(landsat9Data)];
 
   return tleData;
 };
