@@ -17,13 +17,19 @@ data = NinjaAPI(version="2.0")
 class AuthBearer(HttpBearer):
     def authenticate(self, request, token):
         jwt_auth = JWTAuthentication()
+        print(f"Received token: {token}")
         try:
             validated_token = jwt_auth.get_validated_token(token)
+            print(f"Validated token: {validated_token}")
             user = jwt_auth.get_user(validated_token)
+            print(f"Authenticated user: {user}")
             return user
-        except:
+        except InvalidToken as e:
+            print(f"Invalid token: {e}")
             return None
-
+        except Exception as e:
+            print(f"Authentication error: {e}")
+            return None
 
 auth = AuthBearer()
 
@@ -85,6 +91,18 @@ def get_me(request, payload: TokenSchema):
 def get_landsat_image(request, path: int, grid: int):
     # get path/grid data from user
     return "Hello world"
+
+@apiauth.get("/me", auth=auth, response={200: dict, 401: dict})
+def get_me(request):
+    auth_header = request.headers.get("Authorization")
+    
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header.split(" ")[1]
+        user = auth.authenticate(request, token)
+        if user:
+            return 200, {"email": user.email}
+    
+    return 401, {"error": "Unauthorized"}
 
 @apiauth.post("/location", auth=auth, response={200: dict, 401: dict})
 def save_location(request, payload: LocationSchema):
