@@ -1,6 +1,6 @@
 'use client';
 
-import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, XAxis, Line, LineChart } from 'recharts';
 
 import {
   ChartConfig,
@@ -11,34 +11,41 @@ import {
 
 export const description = 'A multiple bar chart';
 
-const chartData = [
-  { month: 'January', desktop: 186, mobile: 80 },
-  { month: 'February', desktop: 305, mobile: 200 },
-  { month: 'March', desktop: 237, mobile: 120 },
-  { month: 'April', desktop: 73, mobile: 190 },
-  { month: 'May', desktop: 209, mobile: 130 },
-  { month: 'June', desktop: 214, mobile: 140 },
+const chartData1 = [
+  { field: 'NDVI', landsat: 0.72, earth: 0.68 },
+  { field: 'EVI', landsat: 0.45, earth: 0.42 },
+  { field: 'Reflectance Intensity', landsat: 0.78, earth: 0.74 },
+  { field: 'Humidity', landsat: 0.65, earth: 0.62 },
+  { field: 'Amplitude', landsat: 1.5, earth: 1.2 },
+];
+
+const chartData2 = [
+  { field: 'NDVI', landsat: 0.61, earth: 0.59 },
+  { field: 'EVI', landsat: 0.39, earth: 0.36 },
+  { field: 'Reflectance Intensity', landsat: 0.83, earth: 0.81 },
+  { field: 'Humidity', landsat: 0.72, earth: 0.72 },
+  { field: 'Amplitude', landsat: 1.3, earth: 1.1 },
 ];
 
 const chartConfig = {
-  desktop: {
-    label: 'Desktop',
+  landsat: {
+    label: 'Landsap',
     color: 'hsl(var(--chart-1))',
   },
-  mobile: {
-    label: 'Mobile',
+  earth: {
+    label: 'Earth',
     color: 'hsl(var(--chart-2))',
   },
 } satisfies ChartConfig;
 
 export function ComparisonChart() {
   return (
-    <div className="mt-5 max-w-[750px]">
-      <ChartContainer config={chartConfig}>
-        <BarChart accessibilityLayer data={chartData}>
+    <div className="mt-8 lg:flex gap-5">
+      <ChartContainer className="lg:w-1/2" config={chartConfig}>
+        <BarChart accessibilityLayer data={chartData1}>
           <CartesianGrid vertical={false} />
           <XAxis
-            dataKey="month"
+            dataKey="field"
             tickLine={false}
             tickMargin={10}
             axisLine={false}
@@ -48,9 +55,43 @@ export function ComparisonChart() {
             cursor={false}
             content={<ChartTooltipContent indicator="dashed" />}
           />
-          <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-          <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
+          <Bar dataKey="landsat" fill="var(--color-landsat)" radius={4} />
+          <Bar dataKey="earth" fill="var(--color-earth)" radius={4} />
         </BarChart>
+      </ChartContainer>
+      <ChartContainer className="lg:w-1/2" config={chartConfig}>
+        <LineChart
+          accessibilityLayer
+          data={chartData2}
+          margin={{
+            left: 12,
+            right: 12,
+          }}
+        >
+          <CartesianGrid vertical={false} />
+          <XAxis
+            dataKey="field"
+            tickLine={false}
+            axisLine={false}
+            tickMargin={8}
+            tickFormatter={(value) => value.slice(0, 3)}
+          />
+          <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+          <Line
+            dataKey="landsat"
+            type="monotone"
+            stroke="var(--color-landsat)"
+            strokeWidth={2}
+            dot={false}
+          />
+          <Line
+            dataKey="earth"
+            type="monotone"
+            stroke="var(--color-earth)"
+            strokeWidth={2}
+            dot={false}
+          />
+        </LineChart>
       </ChartContainer>
     </div>
   );
