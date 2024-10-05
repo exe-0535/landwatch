@@ -45,7 +45,7 @@ export const Navbar = async () => {
           }}
         />
         <Link
-          href="/#"
+          href="/data"
           className={cn(
             buttonVariants({ variant: 'ghost' }),
             'flex h-auto flex-col items-center px-2 py-4 md:p-4 lg:w-full lg:flex-row lg:justify-start lg:gap-3 lg:py-2'
