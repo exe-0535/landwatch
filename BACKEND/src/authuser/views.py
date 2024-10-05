@@ -128,3 +128,28 @@ def save_location(request, payload: LocationSchema):
             "longitude": location.longitude
         }
     }
+
+@apiauth.get("/last-location", auth=AuthBearer(), response={200: dict, 401: dict})
+def get_last_location(request):
+    auth_header = request.headers.get("Authorization")
+    
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header.split(" ")[1]
+        user = auth.authenticate(request, token)
+
+    if user is None:
+        return 401, {"error": "Unauthorized"}
+
+    last_location = Location.objects.filter(user=user).order_by('-created_at').first()
+
+    if last_location:
+        return 200, {
+            "longitude": last_location.longitude,
+            "latitude": last_location.latitude
+        }
+    else:
+        return 200, {
+            "email": user.email,
+            "message": "No locations found for this user"
+        }
+
