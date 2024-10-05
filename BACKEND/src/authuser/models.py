@@ -30,7 +30,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=30, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
@@ -39,9 +38,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
+
+
 class Location(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="locations")
     latitude = models.FloatField()
     longitude = models.FloatField()
     created_at = models.DateTimeField(auto_now_add=True)
+
     def __str__(self):
         return f"{self.user.email} - ({self.latitude}, {self.longitude})"

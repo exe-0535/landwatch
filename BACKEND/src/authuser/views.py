@@ -88,13 +88,25 @@ def get_landsat_image(request, path: int, grid: int):
 
 @apiauth.post("/location", auth=auth, response={200: dict, 401: dict})
 def save_location(request, payload: LocationSchema):
-    user = request.user
-    if not user.is_authenticated:
+    auth_header = request.headers.get("Authorization")
+    
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header.split(" ")[1]
+        user = auth.authenticate(request, token)
+
+    if user is None:
         return 401, {"error": "Unauthorized"}
+
     location = Location.objects.create(
         user=user,
         latitude=payload.latitude,
         longitude=payload.longitude
     )
-    
-    return 200, {"message": "Location saved successfully", "location": {"latitude": location.latitude, "longitude": location.longitude}}
+
+    return 200, {
+        "message": "Location saved successfully", 
+        "location": {
+            "latitude": location.latitude,
+            "longitude": location.longitude
+        }
+    }
