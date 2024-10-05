@@ -9,6 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import L from 'leaflet';
 import { z } from 'zod';
 
+import { setLocationAction } from '@/actions/actions';
 import { Icons } from '@/components/shared/icons';
 import { Button } from '@/components/ui/button';
 import {
@@ -28,6 +29,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
 
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
@@ -80,27 +82,29 @@ const MapClickHandler = ({
 };
 
 type LocationModalProps = {
-  localization: {
+  location: {
     latitude: number;
     longitude: number;
   };
 };
 
-export const LocationModal = ({ localization }: LocationModalProps) => {
+export const LocationModal = ({ location }: LocationModalProps) => {
+  const [isOpen, setIsOpen] = useState(false);
   const [coords, setCoords] = useState<L.LatLngExpression>([
-    localization.latitude,
-    localization.longitude,
+    location.latitude,
+    location.longitude,
   ]);
   const mapRef = useRef<L.Map | null>(null);
   const form = useForm<TSelectLocationFormSchema>({
     resolver: zodResolver(selectLocationFormSchema),
     defaultValues: {
-      latitude: `${localization.latitude}`,
-      longitude: `${localization.longitude}`,
+      latitude: `${location.latitude}`,
+      longitude: `${location.longitude}`,
     },
   });
   const latitude = form.watch('latitude');
   const longitude = form.watch('longitude');
+  const { toast } = useToast();
 
   useEffect(() => {
     if (latitude && longitude) {
@@ -125,11 +129,29 @@ export const LocationModal = ({ localization }: LocationModalProps) => {
       mapRef.current.setView(newCords);
     }
 
-    console.log(newCords);
+    const { data, error } = await setLocationAction({
+      latitude: +latitude,
+      longitude: +longitude,
+    });
+
+    if (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Oops! Something went wrong.',
+      });
+    }
+
+    if (data) {
+      toast({
+        title: 'Location saved succesfully',
+      });
+
+      setIsOpen(false);
+    }
   };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
           variant="ghost"

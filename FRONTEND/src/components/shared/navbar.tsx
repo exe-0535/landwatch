@@ -4,9 +4,14 @@ import { LocationModal } from '@/components/location/location-modal';
 import { NotificationsList } from '@/components/notifications/notifications-list';
 import { Icons } from '@/components/shared/icons';
 import { buttonVariants } from '@/components/ui/button';
+import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
-export const Navbar = () => {
+export const Navbar = async () => {
+  const { data } = await api<{ latitude: number; longitude: number }>(
+    'auth/last-location'
+  );
+
   return (
     <div className="md:flex md:h-screen md:w-fit md:flex-col md:items-center md:border-r md:py-8 lg:items-start lg:py-10">
       <Link href="/" className="hidden md:mb-8 md:block lg:ml-9">
@@ -29,7 +34,10 @@ export const Navbar = () => {
           </span>
         </Link>
         <LocationModal
-          localization={{ latitude: 50.5826005, longitude: 22.053586 }}
+          location={{
+            latitude: data?.latitude as number,
+            longitude: data?.longitude as number,
+          }}
         />
         <Link
           href="/#"
