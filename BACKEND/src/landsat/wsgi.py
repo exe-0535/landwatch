@@ -1,5 +1,5 @@
 """
-WSGI config for landsat project.
+WSGI config for landsat_prerelease project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
