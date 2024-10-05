@@ -248,7 +248,9 @@ const LocationModal = ({ location }: LocationModalProps) => {
               name="timeForNotifications"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>
+                    Select the appropriate lead time for notifications
+                  </FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}

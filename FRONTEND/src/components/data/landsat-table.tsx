@@ -56,10 +56,10 @@ const tableData = [
   },
 ];
 
-export const DataTable = () => {
+export const LandsatTable = () => {
   return (
     <div className="rounded border p-5">
-      <h3 className="mb-4 text-xl font-semibold tracking-tighter">
+      <h3 className="mb-3 text-xl font-semibold tracking-tight">
         Landsat Data
       </h3>
       <Table>
