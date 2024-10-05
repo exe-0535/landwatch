@@ -37,3 +37,16 @@ export const logoutAction = async () => {
 
   redirect('/sign-in');
 };
+
+export const setLocationAction = async (body: {
+  latitude: number;
+  longitude: number;
+}) => {
+  return await api('auth/location', {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+};
