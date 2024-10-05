@@ -138,7 +138,7 @@ export const LocationModal = ({ localization }: LocationModalProps) => {
           }
         >
           <Icons.pin className="block" />
-          <span className="text-sm md:hidden lg:block lg:text-base">
+          <span className="text-[13px] md:hidden lg:block lg:text-base">
             My Location
           </span>
         </Button>

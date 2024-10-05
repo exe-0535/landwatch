@@ -34,4 +34,6 @@ export const authAction = async (
 export const logoutAction = async () => {
   cookies().delete('access');
   cookies().delete('refresh');
+
+  redirect('/sign-in');
 };

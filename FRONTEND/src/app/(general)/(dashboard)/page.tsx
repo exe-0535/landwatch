@@ -1,6 +1,5 @@
 import { DashboardMap } from '@/components/location/dashboard-map';
-import { Icons } from '@/components/shared/icons';
-import { Button } from '@/components/ui/button';
+import { UserDropdown } from '@/components/shared/user-dropdown';
 
 const Home = () => {
   return (
@@ -10,9 +9,7 @@ const Home = () => {
         <h2 className="hidden text-center text-2xl font-semibold tracking-tight md:block">
           Dashboard
         </h2>
-        <Button size="icon" variant="outline">
-          <Icons.user />
-        </Button>
+        <UserDropdown />
       </div>
       <div className="mb-20 mt-5 md:mb-10">
         <DashboardMap />
