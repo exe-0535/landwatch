@@ -29,6 +29,13 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 
 L.Icon.Default.mergeOptions({
@@ -59,6 +66,10 @@ const selectLocationFormSchema = z.object({
       message: 'Longitude must be between -180 and 180',
     }
   ),
+  timeForNotifications: z.string({
+    required_error:
+      'Please select the appropriate lead time for notifications.',
+  }),
 });
 
 type TSelectLocationFormSchema = z.infer<typeof selectLocationFormSchema>;
@@ -144,6 +155,7 @@ const LocationModal = ({ location }: LocationModalProps) => {
     if (data) {
       toast({
         title: 'Location saved succesfully',
+        description: 'Next landsat 06.10.2024 19:52:31',
       });
 
       setIsOpen(false);
@@ -231,6 +243,31 @@ const LocationModal = ({ location }: LocationModalProps) => {
                 )}
               />
             </div>
+            <FormField
+              control={form.control}
+              name="timeForNotifications"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select the appropriate lead time for notifications" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="1">1 hour</SelectItem>
+                      <SelectItem value="24">24 hour</SelectItem>
+                      <SelectItem value="48">48 hour</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <Button
               disabled={form.formState.isSubmitting}
               className="w-full"
