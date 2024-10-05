@@ -24,7 +24,7 @@ export const Navbar = () => {
           )}
         >
           <Icons.dashboard className="block" />
-          <span className="text-sm md:hidden lg:block lg:text-base">
+          <span className="text-[13px] md:hidden lg:block lg:text-base">
             Dashboard
           </span>
         </Link>
@@ -39,7 +39,9 @@ export const Navbar = () => {
           )}
         >
           <Icons.chart className="block" />
-          <span className="text-sm md:hidden lg:block lg:text-base">Data</span>
+          <span className="text-[13px] md:hidden lg:block lg:text-base">
+            Data
+          </span>
         </Link>
         <NotificationsList />
       </nav>

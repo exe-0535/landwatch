@@ -5,6 +5,7 @@ import {
   Info,
   LayoutDashboard,
   Loader2,
+  LogOut,
   MapPin,
   User,
 } from 'lucide-react';
@@ -18,4 +19,5 @@ export const Icons = {
   user: User,
   info: Info,
   arrowRight: ArrowRight,
+  logOut: LogOut,
 };
