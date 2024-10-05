@@ -1,6 +1,8 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
 from ninja.main import NinjaAPI
+from .models import Location  
+from .schemas import LocationSchema  
 from ninja.security import HttpBearer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import InvalidToken
@@ -83,3 +85,16 @@ def get_me(request, payload: TokenSchema):
 def get_landsat_image(request, path: int, grid: int):
     # get path/grid data from user
     return "Hello world"
+
+@apiauth.post("/location", auth=auth, response={200: dict, 401: dict})
+def save_location(request, payload: LocationSchema):
+    user = request.user
+    if not user.is_authenticated:
+        return 401, {"error": "Unauthorized"}
+    location = Location.objects.create(
+        user=user,
+        latitude=payload.latitude,
+        longitude=payload.longitude
+    )
+    
+    return 200, {"message": "Location saved successfully", "location": {"latitude": location.latitude, "longitude": location.longitude}}

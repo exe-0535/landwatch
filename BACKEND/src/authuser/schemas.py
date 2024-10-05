@@ -15,3 +15,7 @@ class TokenRefreshSchema(Schema):
 class TokenSchema(Schema):
     access: str
     refresh: Optional[str] = None
+
+class LocationSchema(Schema):
+    latitude: float
+    longitude: float
