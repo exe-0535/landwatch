@@ -1,8 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { LoginForm } from '@/components/auth/login-form';
-import { RegisterForm } from '@/components/auth/register-form';
+import { AuthForm } from '@/components/auth/auth-form';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -30,7 +29,7 @@ const AuthPage = ({ params }: { params: { slug: string } }) => {
             ? ' Enter your credentials below to create your account'
             : 'Enter your credentials below to login to your account'}
         </p>
-        {isSignUp ? <RegisterForm /> : <LoginForm />}
+        <AuthForm isSignUp={isSignUp} />
         {isSignUp ? (
           <p className="mt-3 text-center">
             Already have an account?{' '}
