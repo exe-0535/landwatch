@@ -82,7 +82,7 @@ export const DashboardMap = () => {
 
     getSatellitePositions();
 
-    const interval = setInterval(getSatellitePositions, 1000);
+    const interval = setInterval(getSatellitePositions, 5000);
     return () => clearInterval(interval);
   }, []);
 
