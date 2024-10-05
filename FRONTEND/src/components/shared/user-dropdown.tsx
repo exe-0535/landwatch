@@ -15,7 +15,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-export const UserDropdown = () => {
+type UserDropdownProps = {
+  email: string;
+};
+
+export const UserDropdown = ({ email }: UserDropdownProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -34,7 +38,7 @@ export const UserDropdown = () => {
             width={50}
             height={50}
           />
-          <p>test@gmail.com</p>
+          <p>{email}</p>
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={async () => await logoutAction()}>

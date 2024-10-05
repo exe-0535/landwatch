@@ -6,10 +6,10 @@ type TResponse<T> = {
 const getToken = async () => {
   if (typeof window === 'undefined') {
     const { cookies } = await import('next/headers');
-    return cookies().get('token')?.value;
+    return cookies().get('access')?.value;
   } else {
     return document.cookie.replace(
-      /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
+      /(?:(?:^|.*;\s*)access\s*=\s*([^;]*).*$)|^.*$/,
       '$1'
     );
   }
