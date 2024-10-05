@@ -40,11 +40,20 @@ User = get_user_model()
 def register(request, payload: UserRegisterSchema):
     if User.objects.filter(email=payload.email).exists():
         return 400, {"error": "User with this email already exists."}
+    
     user = User.objects.create_user(
         email=payload.email,
         password=payload.password
     )
+    Location.objects.create(
+        user=user,
+        latitude=50.57783306469678,  # Default latitude
+        longitude=22.055728493148585  # Default longitude
+    )
+
+
     tokens = get_tokens_for_user(user)
+
     return 200, tokens
 
 
