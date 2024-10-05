@@ -106,9 +106,15 @@ def get_me(request):
 
 @apiauth.post("/location", auth=auth, response={200: dict, 401: dict})
 def save_location(request, payload: LocationSchema):
-    user = request.user
-    if not user.is_authenticated:
+    auth_header = request.headers.get("Authorization")
+    
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header.split(" ")[1]
+        user = auth.authenticate(request, token)
+
+    if user is None:
         return 401, {"error": "Unauthorized"}
+
     location = Location.objects.create(
         user=user,
         latitude=payload.latitude,
@@ -122,7 +128,6 @@ def save_location(request, payload: LocationSchema):
             "longitude": location.longitude
         }
     }
-
 
 @apiauth.get("/last-location", auth=AuthBearer(), response={200: dict, 401: dict})
 def get_last_location(request):
@@ -147,3 +152,4 @@ def get_last_location(request):
             "email": user.email,
             "message": "No locations found for this user"
         }
+
