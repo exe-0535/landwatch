@@ -1,3 +1,5 @@
+import { ComparisonChart } from './comparison-chart';
+
 import {
   Table,
   TableBody,
@@ -113,9 +115,9 @@ const calculateComparisonData = () => {
   });
 };
 
-const comparisonData = calculateComparisonData();
-
 export const ComparisonTable = () => {
+  const comparisonData = calculateComparisonData();
+
   return (
     <div className="rounded border p-5">
       <h3 className="mb-3 text-xl font-semibold tracking-tight">
@@ -267,6 +269,7 @@ export const ComparisonTable = () => {
           </Table>
         </TabsContent>
       </Tabs>
+      <ComparisonChart />
     </div>
   );
 };
