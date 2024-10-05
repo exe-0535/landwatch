@@ -88,7 +88,7 @@ type LocationModalProps = {
   };
 };
 
-export const LocationModal = ({ location }: LocationModalProps) => {
+const LocationModal = ({ location }: LocationModalProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [coords, setCoords] = useState<L.LatLngExpression>([
     location.latitude,
@@ -247,3 +247,5 @@ export const LocationModal = ({ location }: LocationModalProps) => {
     </Dialog>
   );
 };
+
+export default LocationModal;

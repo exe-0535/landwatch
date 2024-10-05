@@ -16,26 +16,26 @@ type SatellitePosition = {
 };
 
 const fetchTLEData = async () => {
-  const landsat8Response = await fetch(
-    'https://celestrak.org/NORAD/elements/gp.php?CATNR=39084'
-  );
-  const landsat9Response = await fetch(
-    'https://celestrak.org/NORAD/elements/gp.php?CATNR=49260'
+  const response = await fetch(
+    'https://celestrak.com/NORAD/elements/resource.txt'
   );
 
-  const landsat8Data = await landsat8Response.text();
-  const landsat9Data = await landsat9Response.text();
+  const data = await response.text();
 
-  const parseTLE = (data: string) => {
-    const lines = data.split('\n');
-    return {
-      name: lines[0]?.trim(),
-      line1: lines[1]?.trim(),
-      line2: lines[2]?.trim(),
-    };
-  };
+  const lines = data.split('\n');
+  const tleData = [];
 
-  const tleData = [parseTLE(landsat8Data), parseTLE(landsat9Data)];
+  for (let i = 0; i < lines.length; i += 3) {
+    const name = lines[i]?.trim();
+    const line1 = lines[i + 1]?.trim();
+    const line2 = lines[i + 2]?.trim();
+
+    if (name && line1 && line2) {
+      if (name === 'LANDSAT 8' || name === 'LANDSAT 9') {
+        tleData.push({ name, line1, line2 });
+      }
+    }
+  }
 
   return tleData;
 };
@@ -49,7 +49,14 @@ L.Icon.Default.mergeOptions({
     'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-export const DashboardMap = () => {
+type DashboardMapProps = {
+  location: {
+    latitude: number;
+    longitude: number;
+  };
+};
+
+const DashboardMap = ({ location }: DashboardMapProps) => {
   const [isGridVisible, setIsGridVisible] = useState(false);
   const [satellitePositions, setSatellitePositions] = useState<
     SatellitePosition[]
@@ -90,7 +97,7 @@ export const DashboardMap = () => {
     <div>
       <MapContainer
         className="z-10 h-[500px] w-full rounded"
-        center={[50.5826005, 22.053586]}
+        center={[location.latitude, location.longitude]}
         zoom={3}
         scrollWheelZoom={false}
       >
@@ -98,7 +105,7 @@ export const DashboardMap = () => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <Marker position={[50.5826005, 22.053586]}></Marker>
+        <Marker position={[location.latitude, location.longitude]}></Marker>
         {satellitePositions.map(({ name, latitude, longitude }) => (
           <Marker
             key={name}
@@ -142,3 +149,5 @@ export const DashboardMap = () => {
     </div>
   );
 };
+
+export default DashboardMap;

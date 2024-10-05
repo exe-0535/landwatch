@@ -1,4 +1,5 @@
 'use server';
+import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -42,11 +43,15 @@ export const setLocationAction = async (body: {
   latitude: number;
   longitude: number;
 }) => {
-  return await api('auth/location', {
+  const { data, error } = await api('auth/location', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
       'Content-Type': 'application/json',
     },
   });
+
+  revalidateTag('location');
+
+  return { data, error };
 };

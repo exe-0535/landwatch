@@ -1,11 +1,16 @@
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
-import { LocationModal } from '@/components/location/location-modal';
 import { NotificationsList } from '@/components/notifications/notifications-list';
 import { Icons } from '@/components/shared/icons';
 import { buttonVariants } from '@/components/ui/button';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
+
+const LocationModal = dynamic(
+  () => import('@/components/location/location-modal'),
+  { ssr: false }
+);
 
 export const Navbar = async () => {
   const { data } = await api<{ latitude: number; longitude: number }>(
