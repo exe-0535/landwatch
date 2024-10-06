@@ -50,18 +50,36 @@ The **Landsat Explorer** app merges the powerful capabilities of Landsat satelli
    ```bash
    git clone https://github.com/exe-0535/landwatch.git
    ```
-2. **Install Dependencies**
+
+## 🖥️ Launch Server
+   
+1. **Install Dependencies**
    ```bash
-   cd landwatch
-   npm install
+   cd landwatch -> BACKEND 
+   pip install -r requirements.txt
    ```
-3. **Run the Application**
+2. **Run Server**
+   ```bash
+   cd BACKEND -> src
+   python manage.py makemigrations
+   python manage.py migrate
+   python manage.py runserver 8001
+   ```
+   Make sure that the port is 8001
+
+## 🗄️ How to Run Client
+
+1. **Install Dependencies**
+   ```bash
+   cd landwatch -> FRONTEND 
+   npm install 
+   ```
+2. **Run Client**
    ```bash
    npm run dev
    ```
-4. **Access the App**
-   Visit `http://localhost:3000` in your browser to start exploring!
-
+3. **Open App**
+   <a href="http://localhost:3000/">http://localhost:3000/</a>
 ---
 
 ## 🔧 Tech Stack
