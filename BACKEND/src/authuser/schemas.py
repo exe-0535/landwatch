@@ -19,3 +19,4 @@ class TokenSchema(Schema):
 class LocationSchema(Schema):
     latitude: float
     longitude: float
+    notification_advance: int
