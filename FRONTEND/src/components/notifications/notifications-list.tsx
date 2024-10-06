@@ -12,27 +12,15 @@ import {
 } from '@/components/ui/sheet';
 import { api } from '@/lib/api';
 
-const notifications = [
-  {
-    id: 1,
-    title: 'Gravida viverra mattis nunc',
-    description: 'Lorem ipsum dolor sit amet consectetur.',
-    createdAt: moment().subtract(5, 'days').toDate(),
-  },
-  {
-    id: 2,
-    title: 'Nunc volutpat lacus',
-    description:
-      'Lorem ipsum dolor sit amet consectetur. Arcu solli senectus fermentum commodo.',
-    createdAt: moment().subtract(2, 'weeks').toDate(),
-  },
-  {
-    id: 3,
-    title: 'Aliquam eget finibus',
-    description: 'Cras a augue convallis, viverra elit non, volutpat risus.',
-    createdAt: moment().subtract(3, 'hours').toDate(),
-  },
-];
+export const NotificationsList = async () => {
+  const { data } = await api<
+    {
+      title: string;
+      start_time: string;
+      end_time: string;
+      notification_sent: string;
+    }[]
+  >('data/events');
 
   return (
     <Sheet>
