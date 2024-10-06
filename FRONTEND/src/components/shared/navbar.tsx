@@ -20,8 +20,6 @@ export const Navbar = async () => {
     cloud_coverage: number;
   }>('auth/last-location');
 
-  console.log(data);
-
   return (
     <div className="md:flex md:h-screen md:w-fit md:flex-col md:items-center md:border-r md:py-8 lg:items-start lg:py-10">
       <Link href="/" className="hidden md:mb-8 md:block lg:ml-9">

@@ -15,8 +15,9 @@ import { useState } from 'react';
 const tableData = [
   {
     id: 1,
+    landsatName: 'LC08_L2SP_186025_20240924_20240928_02_T1_ST_B10',
     dateTime: '2024-10-05 14:30',
-    landsat: 'Landsat 8',
+    landsatId: 'Landsat 8',
     latLong: '45.1234, 122.1234',
     wrs: 'Path 44, Row 34',
     cloudCover: '10%',
@@ -24,8 +25,9 @@ const tableData = [
   },
   {
     id: 2,
+    landsatName: 'LC08_L2SP_186025_20241005_20241009_02_T1_ST_B10',
     dateTime: '2024-10-06 10:15',
-    landsat: 'Landsat 9',
+    landsatId: 'Landsat 9',
     latLong: '46.5678, 123.5678',
     wrs: 'Path 45, Row 35',
     cloudCover: '5%',
@@ -33,8 +35,9 @@ const tableData = [
   },
   {
     id: 3,
+    landsatName: 'LC08_L2SP_186025_20241010_20241014_02_T1_ST_B10',
     dateTime: '2024-09-29 08:00',
-    landsat: 'Landsat 9',
+    landsatId: 'Landsat 9',
     latLong: '47.8765, 124.9876',
     wrs: 'Path 46, Row 36',
     cloudCover: '20%',
@@ -42,8 +45,9 @@ const tableData = [
   },
   {
     id: 4,
+    landsatName: 'LC08_L2SP_186025_20241015_20241019_02_T1_ST_B10',
     dateTime: '2024-09-25 16:45',
-    landsat: 'Landsat 8',
+    landsatId: 'Landsat 8',
     latLong: '44.7654, 121.7654',
     wrs: 'Path 43, Row 33',
     cloudCover: '15%',
@@ -51,8 +55,9 @@ const tableData = [
   },
   {
     id: 5,
+    landsatName: 'LC08_L2SP_186025_20241020_20241024_02_T1_ST_B10',
     dateTime: '2024-09-20 12:30',
-    landsat: 'Landsat 9',
+    landsatId: 'Landsat 9',
     latLong: '48.4321, 125.4321',
     wrs: 'Path 47, Row 37',
     cloudCover: '8%',
@@ -93,7 +98,8 @@ export const LandsatTable = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="font-medium">Landsat</TableHead>
+              <TableHead className="font-medium">Landsat ID</TableHead>
+              <TableHead>Landsat name</TableHead>
               <TableHead>Date & time</TableHead>
               <TableHead>Latitude/Longitude</TableHead>
               <TableHead>WRS</TableHead>
@@ -106,7 +112,8 @@ export const LandsatTable = () => {
             {filteredData.map(
               ({
                 id,
-                landsat,
+                landsatId,
+                landsatName,
                 dateTime,
                 latLong,
                 wrs,
@@ -114,7 +121,8 @@ export const LandsatTable = () => {
                 imageQuality,
               }) => (
                 <TableRow key={id}>
-                  <TableCell className="font-medium">{landsat}</TableCell>
+                  <TableCell className="font-medium">{landsatId}</TableCell>
+                  <TableCell>{landsatName}</TableCell>
                   <TableCell>{dateTime}</TableCell>
                   <TableCell>{latLong}</TableCell>
                   <TableCell>{wrs}</TableCell>
