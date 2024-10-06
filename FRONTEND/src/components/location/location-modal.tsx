@@ -188,7 +188,7 @@ const LocationModal = ({ location }: LocationModalProps) => {
           ref={mapRef}
           className="z-10 h-[300px] w-full rounded"
           center={coords}
-          zoom={13}
+          zoom={8}
           scrollWheelZoom={false}
         >
           <TileLayer
@@ -262,8 +262,8 @@ const LocationModal = ({ location }: LocationModalProps) => {
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="1">1 hour</SelectItem>
-                      <SelectItem value="24">24 hour</SelectItem>
-                      <SelectItem value="48">48 hour</SelectItem>
+                      <SelectItem value="24">24 hours</SelectItem>
+                      <SelectItem value="48">48 hours</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
