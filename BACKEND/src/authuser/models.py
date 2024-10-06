@@ -44,4 +44,5 @@ class Location(models.Model):
     latitude = models.FloatField(default=50.57783306469678)
     longitude = models.FloatField(default=22.055728493148585)
     notification_advance = models.PositiveIntegerField(default=1)
+    cloud_coverage = models.PositiveIntegerField(default=15)
     created_at = models.DateTimeField(auto_now_add=True)

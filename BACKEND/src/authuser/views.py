@@ -55,7 +55,6 @@ class AuthBearer(HttpBearer):
         print(f"Received token: {token}")
         try:
             validated_token = jwt_auth.get_validated_token(token)
-            print(f"Validated token: {validated_token}")
             user = jwt_auth.get_user(validated_token)
             print(f"Authenticated user: {user}")
             return user
@@ -166,7 +165,8 @@ def save_location(request, payload: LocationSchema):
             user=user,
             latitude=payload.latitude,
             longitude=payload.longitude,
-            notification_advance=payload.notification_advance
+            notification_advance=payload.notification_advance,
+            cloud_coverage = payload.cloud_coverage
         )
     except Exception as e:
         logger.error(f"Error saving location: {e}", exc_info=True)
@@ -177,7 +177,8 @@ def save_location(request, payload: LocationSchema):
         "location": {
             "latitude": location.latitude,
             "longitude": location.longitude,
-            "notification_advance": location.notification_advance
+            "notification_advance": location.notification_advance,
+            "cloud_coverage" : location.cloud_coverage
         }
     }
 
@@ -198,7 +199,8 @@ def get_last_location(request):
         return 200, {
             "longitude": last_location.longitude,
             "latitude": last_location.latitude,
-            "notification_advance": last_location.notification_advance
+            "notification_advance": last_location.notification_advance,
+            "cloud_coverage" : last_location.cloud_coverage
         }
     else:
         return 200, {

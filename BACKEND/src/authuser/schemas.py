@@ -20,3 +20,4 @@ class LocationSchema(Schema):
     latitude: float
     longitude: float
     notification_advance: int
+    cloud_coverage: int
