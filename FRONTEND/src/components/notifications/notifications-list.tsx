@@ -10,6 +10,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { api } from '@/lib/api';
 
 const notifications = [
   {
@@ -33,7 +34,6 @@ const notifications = [
   },
 ];
 
-export const NotificationsList = () => {
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -50,21 +50,36 @@ export const NotificationsList = () => {
       <SheetContent className="w-full">
         <SheetHeader>
           <SheetTitle>Notifications</SheetTitle>
-          <SheetDescription>You have 3 unread notifications.</SheetDescription>
+          <SheetDescription>
+            You have {data?.slice(0, 3).length} unread notifications.
+          </SheetDescription>
         </SheetHeader>
         <div className="mt-2">
-          {notifications.map(({ id, title, description, createdAt }) => (
-            <div
-              key={id}
-              className="space-y-1 py-4 [&:not(:last-child)]:border-b"
-            >
-              <h3 className="font-medium">{title}</h3>
-              <p className="text-muted-foreground">{description}</p>
-              <span className="text-muted-foreground/50 block text-sm">
-                {moment(createdAt).fromNow()}
-              </span>
-            </div>
-          ))}
+          {data?.length &&
+            data
+              .slice(0, 3)
+              .map(({ end_time, notification_sent, start_time, title }, i) => (
+                <div
+                  key={i}
+                  className="space-y-1 py-4 [&:not(:last-child)]:border-b"
+                >
+                  <h3 className="font-medium">{title}</h3>
+                  <p className="text-muted-foreground">
+                    {new Date(start_time)
+                      .toISOString()
+                      .slice(0, 16)
+                      .replace('T', ' ')}{' '}
+                    -{' '}
+                    {new Date(end_time)
+                      .toISOString()
+                      .slice(0, 16)
+                      .replace('T', ' ')}
+                  </p>
+                  <span className="text-muted-foreground/50 block text-sm">
+                    {notification_sent}
+                  </span>
+                </div>
+              ))}
         </div>
       </SheetContent>
     </Sheet>
