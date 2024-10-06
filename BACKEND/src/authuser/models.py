@@ -46,3 +46,15 @@ class Location(models.Model):
     notification_advance = models.PositiveIntegerField(default=1)
     cloud_coverage = models.PositiveIntegerField(default=15)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class Event(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    notification_sent = models.CharField(max_length=100, default="Received 2h ago")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title

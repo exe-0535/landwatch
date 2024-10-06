@@ -1,5 +1,6 @@
 from ninja.schema import Schema
 from typing import Optional
+from datetime import datetime
 
 class UserRegisterSchema(Schema):
     email: str
@@ -21,3 +22,10 @@ class LocationSchema(Schema):
     longitude: float
     notification_advance: int
     cloud_coverage: int
+
+class EventSchema(Schema):
+    title: str
+    start_time: datetime
+    end_time: datetime
+    notification_sent: str
+    created_at: datetime
