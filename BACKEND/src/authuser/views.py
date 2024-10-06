@@ -13,7 +13,8 @@ from .schemas import UserRegisterSchema, UserLoginSchema, TokenSchema, TokenRefr
 from .serializers import get_tokens_for_user, refresh_access_token
 from scraper.scraper import main as scrape_main
 import logging
-
+from .models import Event
+from .schemas import EventSchema
 logger = logging.getLogger(__name__)
 from apscheduler.schedulers.background import BackgroundScheduler
 from smtp.utils import send_notification_email
@@ -326,3 +327,38 @@ def get_landsat_data(request):
         logger.error(f"An error occurred: {str(e)}")
         return 500, {"error": str(e)}
 
+@data.get("/events", auth=auth, response={200: list[EventSchema]})
+def get_events(request):
+    auth_header = request.headers.get("Authorization")
+
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header.split(" ")[1]
+        user = auth.authenticate(request, token)
+    if user is None:
+        return 401, {"error": "Unauthorized"}
+    events = Event.objects.filter(user=user).order_by('start_time')
+    return events
+
+@data.post("/add-event", auth=auth, response={200: dict, 400: dict})
+def add_event(request, payload: EventSchema):
+    try:
+        auth_header = request.headers.get("Authorization")
+
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
+            user = auth.authenticate(request, token)
+        if user is None:
+            return 401, {"error": "Unauthorized"}
+        start_time = datetime.strptime(start_time, "%d-%b %H:%M")
+        end_time = datetime.strptime(end_time, "%d-%b %H:%M")
+
+        event = Event.objects.create(
+            user=user,
+            title=payload.title,
+            start_time=payload.start_time,
+            end_time=payload.end_time
+        )
+
+        return 200, {"message": "Event created successfully", "event_id": event.id}
+    except Exception as e:
+        return 400, {"error": str(e)}

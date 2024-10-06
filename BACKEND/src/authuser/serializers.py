@@ -1,6 +1,8 @@
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from ninja.schema import Schema
+from .models import Event
+from rest_framework import serializers
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -16,3 +18,10 @@ def refresh_access_token(refresh_token: str):
         return {'access': str(access_token)}
     except TokenError as e:
         raise InvalidToken(e.args[0])
+    
+
+
+class EventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = ['id', 'title', 'start_time', 'end_time', 'notification_sent', 'created_at']
