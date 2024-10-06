@@ -17,7 +17,7 @@ const landsatData = [
     ndvi: 0.72,
     evi: 0.45,
     reflectanceIntensity: 0.78,
-    humidity: 65,
+    humidity: 0.65,
     amplitude: 1.5,
   },
   {
@@ -25,7 +25,7 @@ const landsatData = [
     ndvi: 0.61,
     evi: 0.39,
     reflectanceIntensity: 0.83,
-    humidity: 72,
+    humidity: 0.72,
     amplitude: 1.3,
   },
   {
@@ -33,7 +33,7 @@ const landsatData = [
     ndvi: 0.84,
     evi: 0.52,
     reflectanceIntensity: 0.76,
-    humidity: 58,
+    humidity: 0.58,
     amplitude: 1.7,
   },
   {
@@ -41,7 +41,7 @@ const landsatData = [
     ndvi: 0.55,
     evi: 0.33,
     reflectanceIntensity: 0.81,
-    humidity: 70,
+    humidity: 0.7,
     amplitude: 1.4,
   },
   {
@@ -49,7 +49,7 @@ const landsatData = [
     ndvi: 0.65,
     evi: 0.44,
     reflectanceIntensity: 0.79,
-    humidity: 60,
+    humidity: 0.6,
     amplitude: 1.6,
   },
 ];
@@ -60,7 +60,7 @@ const earthData = [
     ndvi: 0.68,
     evi: 0.42,
     reflectanceIntensity: 0.74,
-    humidity: 62,
+    humidity: 0.62,
     amplitude: 1.2,
   },
   {
@@ -68,7 +68,7 @@ const earthData = [
     ndvi: 0.59,
     evi: 0.36,
     reflectanceIntensity: 0.81,
-    humidity: 75,
+    humidity: 0.75,
     amplitude: 1.1,
   },
   {
@@ -76,7 +76,7 @@ const earthData = [
     ndvi: 0.78,
     evi: 0.47,
     reflectanceIntensity: 0.72,
-    humidity: 55,
+    humidity: 0.55,
     amplitude: 1.8,
   },
   {
@@ -84,7 +84,7 @@ const earthData = [
     ndvi: 0.5,
     evi: 0.3,
     reflectanceIntensity: 0.86,
-    humidity: 68,
+    humidity: 0.68,
     amplitude: 1.3,
   },
   {
@@ -92,7 +92,7 @@ const earthData = [
     ndvi: 0.72,
     evi: 0.4,
     reflectanceIntensity: 0.77,
-    humidity: 64,
+    humidity: 0.64,
     amplitude: 1.5,
   },
 ];
@@ -108,7 +108,9 @@ const calculateComparisonData = () => {
       reflectanceIntensityDifference: (
         landsatItem.reflectanceIntensity - earthItem.reflectanceIntensity
       ).toFixed(2),
-      humidityDifference: landsatItem.humidity - earthItem.humidity,
+      humidityDifference: (landsatItem.humidity - earthItem.humidity).toFixed(
+        2
+      ),
       amplitudeDifference: (
         landsatItem.amplitude - earthItem.amplitude
       ).toFixed(2),
