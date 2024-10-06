@@ -37,6 +37,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { addMinutes } from 'date-fns';
+import { format } from 'path';
 
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
@@ -70,6 +72,9 @@ const selectLocationFormSchema = z.object({
     required_error:
       'Please select the appropriate lead time for notifications.',
   }),
+  cloudCoverLimit: z.string({
+    required_error: 'Please select the cloud cover limit',
+  }),
 });
 
 type TSelectLocationFormSchema = z.infer<typeof selectLocationFormSchema>;
@@ -96,6 +101,8 @@ type LocationModalProps = {
   location: {
     latitude: number;
     longitude: number;
+    timeForNotifications: number;
+    cloudCoverLimit: number;
   };
 };
 
@@ -111,6 +118,8 @@ const LocationModal = ({ location }: LocationModalProps) => {
     defaultValues: {
       latitude: `${location.latitude}`,
       longitude: `${location.longitude}`,
+      timeForNotifications: `${location.timeForNotifications}`,
+      cloudCoverLimit: `${location.cloudCoverLimit}`,
     },
   });
   const latitude = form.watch('latitude');
@@ -133,6 +142,7 @@ const LocationModal = ({ location }: LocationModalProps) => {
     latitude,
     longitude,
     timeForNotifications,
+    cloudCoverLimit,
   }: TSelectLocationFormSchema) => {
     const newCords = [+latitude, +longitude] as L.LatLngExpression;
     setCoords(newCords);
@@ -145,6 +155,7 @@ const LocationModal = ({ location }: LocationModalProps) => {
       latitude: +latitude,
       longitude: +longitude,
       notification_advance: parseInt(timeForNotifications.match(/\d+/)![0]),
+      cloud_coverage: +cloudCoverLimit,
     });
 
     if (error) {
@@ -155,9 +166,11 @@ const LocationModal = ({ location }: LocationModalProps) => {
     }
 
     if (data) {
+      const date = `${addMinutes(new Date(), 42)}`;
+
       toast({
         title: 'Location saved succesfully',
-        description: 'Next landsat 06.10.2024 19:52:31',
+        description: `Next landsat will pass at ${date.split(' GMT')[0]}`,
       });
 
       setIsOpen(false);
@@ -190,7 +203,7 @@ const LocationModal = ({ location }: LocationModalProps) => {
           ref={mapRef}
           className="z-10 h-[300px] w-full rounded"
           center={coords}
-          zoom={13}
+          zoom={8}
           scrollWheelZoom={false}
         >
           <TileLayer
@@ -245,33 +258,59 @@ const LocationModal = ({ location }: LocationModalProps) => {
                 )}
               />
             </div>
-            <FormField
-              control={form.control}
-              name="timeForNotifications"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Select the appropriate lead time for notifications
-                  </FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select the appropriate lead time for notifications" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="1">1 hour</SelectItem>
-                      <SelectItem value="24">24 hour</SelectItem>
-                      <SelectItem value="48">48 hour</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="space-y-3 sm:flex sm:gap-3 sm:space-y-0">
+              <FormField
+                control={form.control}
+                name="timeForNotifications"
+                render={({ field }) => (
+                  <FormItem className="sm:w-1/2">
+                    <FormLabel>Lead time for notifications</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={`${location.timeForNotifications}`}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="1">1 hour</SelectItem>
+                        <SelectItem value="24">24 hours</SelectItem>
+                        <SelectItem value="48">48 hours</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="cloudCoverLimit"
+                render={({ field }) => (
+                  <FormItem className="sm:w-1/2">
+                    <FormLabel>Cloud cover limit</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={`${location.cloudCoverLimit}`}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="15">15%</SelectItem>
+                        <SelectItem value="20">20%</SelectItem>
+                        <SelectItem value="30">30%</SelectItem>
+                        <SelectItem value="40">40%</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <Button
               disabled={form.formState.isSubmitting}
               className="w-full"

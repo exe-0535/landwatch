@@ -43,6 +43,7 @@ export const setLocationAction = async (body: {
   latitude: number;
   longitude: number;
   notification_advance: number;
+  cloud_coverage: number;
 }) => {
   const { data, error } = await api('auth/location', {
     method: 'POST',

@@ -13,9 +13,14 @@ const LocationModal = dynamic(
 );
 
 export const Navbar = async () => {
-  const { data } = await api<{ latitude: number; longitude: number }>(
-    'auth/last-location'
-  );
+  const { data } = await api<{
+    latitude: number;
+    longitude: number;
+    notification_advance: number;
+    cloud_coverage: number;
+  }>('auth/last-location');
+
+  console.log(data);
 
   return (
     <div className="md:flex md:h-screen md:w-fit md:flex-col md:items-center md:border-r md:py-8 lg:items-start lg:py-10">
@@ -42,6 +47,8 @@ export const Navbar = async () => {
           location={{
             latitude: data?.latitude as number,
             longitude: data?.longitude as number,
+            timeForNotifications: data?.notification_advance as number,
+            cloudCoverLimit: data?.cloud_coverage as number,
           }}
         />
         <Link
