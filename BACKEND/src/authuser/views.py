@@ -21,6 +21,7 @@ from datetime import datetime, timedelta, timezone as tz
 from django.utils import timezone
 from .scheduler import scheduler
 
+
 apiauth = NinjaAPI(version="1.0")
 data = NinjaAPI(version="2.0")
 
@@ -202,7 +203,7 @@ def get_last_location(request):
 
     last_location = Location.objects.filter(user=user).order_by('-created_at').first()
 
-    if last_location:
+
 
         return 200, {
             "longitude": last_location.longitude,
@@ -275,6 +276,7 @@ def scrape_data(request):
 
 
 
+
 import os
 from django.conf import settings
 
@@ -323,3 +325,4 @@ def get_landsat_data(request):
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}")
         return 500, {"error": str(e)}
+
