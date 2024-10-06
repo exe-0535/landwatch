@@ -9,11 +9,9 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 
-export const description = 'A multiple bar chart';
-
 const chartData1 = [
   { field: 'NDVI', landsat: 0.72, earth: 0.68 },
-  { field: 'EVI', landsat: 0.45, earth: 0.42 },
+  { field: 'EVI', landsat: 0.65, earth: 0.42 },
   { field: 'Reflectance Intensity', landsat: 0.78, earth: 0.74 },
   { field: 'Humidity', landsat: 0.65, earth: 0.62 },
   { field: 'Amplitude', landsat: 1.5, earth: 1.2 },
@@ -22,7 +20,7 @@ const chartData1 = [
 const chartData2 = [
   { field: 'NDVI', landsat: 0.61, earth: 0.59 },
   { field: 'EVI', landsat: 0.39, earth: 0.36 },
-  { field: 'Reflectance Intensity', landsat: 0.83, earth: 0.81 },
+  { field: 'Reflectance Intensity', landsat: 0.63, earth: 0.81 },
   { field: 'Humidity', landsat: 0.72, earth: 0.72 },
   { field: 'Amplitude', landsat: 1.3, earth: 1.1 },
 ];

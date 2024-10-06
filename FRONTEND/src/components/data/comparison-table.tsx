@@ -9,6 +9,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 
 const landsatData = [
   {
@@ -120,9 +121,12 @@ export const ComparisonTable = () => {
 
   return (
     <div className="rounded border p-5">
-      <h3 className="mb-3 text-xl font-semibold tracking-tight">
-        Landsat vs Earth Comparison
-      </h3>
+      <div className="sm:flex justify-between items-center">
+        <h3 className="mb-3 text-xl font-semibold tracking-tight">
+          Landsat vs Earth Comparison
+        </h3>
+        <Button className="hidden sm:block">Upload data</Button>
+      </div>
       <Tabs defaultValue="landsat">
         <TabsList>
           <TabsTrigger value="landsat">Landsat</TabsTrigger>
