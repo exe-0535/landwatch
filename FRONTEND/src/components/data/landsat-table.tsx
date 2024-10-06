@@ -129,7 +129,11 @@ export const LandsatTable = () => {
                   <TableCell>{cloudCover}</TableCell>
                   <TableCell>{imageQuality}</TableCell>
                   <TableCell className="text-right">
-                    <Button variant="outline">Download</Button>
+                    <Button variant="outline" asChild>
+                      <a href="/landsat_data.xlsx" download>
+                        Download
+                      </a>
+                    </Button>
                   </TableCell>
                 </TableRow>
               )
