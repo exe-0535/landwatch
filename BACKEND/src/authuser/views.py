@@ -1,8 +1,8 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
 from ninja.main import NinjaAPI
-from .models import Location  
-from .schemas import LocationSchema  
+from .models import Location
+from .schemas import LocationSchema
 from ninja.security import HttpBearer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import InvalidToken
@@ -13,26 +13,29 @@ from .schemas import UserRegisterSchema, UserLoginSchema, TokenSchema, TokenRefr
 from .serializers import get_tokens_for_user, refresh_access_token
 from scraper.scraper import main as scrape_main
 import logging
+
 logger = logging.getLogger(__name__)
 from apscheduler.schedulers.background import BackgroundScheduler
 from smtp.utils import send_notification_email
 from datetime import datetime, timedelta, timezone as tz
 from django.utils import timezone
-from .scheduler import scheduler 
+from .scheduler import scheduler
+from grid_converter.utils import create_grid
 
 apiauth = NinjaAPI(version="1.0")
 data = NinjaAPI(version="2.0")
 
 scheduler = BackgroundScheduler()
 
+
 def schedule_email(user_email, start_time):
     if timezone.is_naive(start_time):
         start_time = timezone.make_aware(start_time, timezone=tz.utc)
-    
+
     if start_time < timezone.now():
         logger.warning(f"Start time {start_time} is in the past. Skipping email scheduling for {user_email}.")
         return
-    
+
     job_id = f"{user_email}_{start_time.isoformat()}"
     try:
         scheduler.add_job(
@@ -48,7 +51,8 @@ def schedule_email(user_email, start_time):
         logger.error(f"Failed to schedule email for {user_email} at {start_time}: {e}", exc_info=True)
 
     print(f"Email scheduled for {user_email} at {start_time} for location")
- 
+
+
 class AuthBearer(HttpBearer):
     def authenticate(self, request, token):
         jwt_auth = JWTAuthentication()
@@ -65,6 +69,7 @@ class AuthBearer(HttpBearer):
             print(f"Authentication error: {e}")
             return None
 
+
 auth = AuthBearer()
 
 User = get_user_model()
@@ -74,7 +79,7 @@ User = get_user_model()
 def register(request, payload: UserRegisterSchema):
     if User.objects.filter(email=payload.email).exists():
         return 400, {"error": "User with this email already exists."}
-    
+
     user = User.objects.create_user(
         email=payload.email,
         password=payload.password
@@ -84,7 +89,6 @@ def register(request, payload: UserRegisterSchema):
         latitude=50.57783306469678,  # Default latitude
         longitude=22.055728493148585  # Default longitude
     )
-
 
     tokens = get_tokens_for_user(user)
 
@@ -132,25 +136,26 @@ def get_me(request, payload: TokenSchema):
 
 @data.post("/get-landsat-image")
 def get_landsat_image(request):
-
     return "Hello world"
+
 
 @apiauth.get("/me", auth=auth, response={200: dict, 401: dict})
 def get_me(request):
     auth_header = request.headers.get("Authorization")
-    
+
     if auth_header and auth_header.startswith("Bearer "):
         token = auth_header.split(" ")[1]
         user = auth.authenticate(request, token)
         if user:
             return 200, {"email": user.email}
-    
+
     return 401, {"error": "Unauthorized"}
+
 
 @apiauth.post("/location", auth=auth, response={200: dict, 401: dict, 400: dict})
 def save_location(request, payload: LocationSchema):
     auth_header = request.headers.get("Authorization")
-    
+
     if auth_header and auth_header.startswith("Bearer "):
         token = auth_header.split(" ")[1]
         user = auth.authenticate(request, token)
@@ -172,8 +177,10 @@ def save_location(request, payload: LocationSchema):
         logger.error(f"Error saving location: {e}", exc_info=True)
         return 400, {"error": "Failed to save location."}
 
+
+
     return 200, {
-        "message": "Location saved successfully", 
+        "message": "Location saved successfully",
         "location": {
             "latitude": location.latitude,
             "longitude": location.longitude,
@@ -182,10 +189,11 @@ def save_location(request, payload: LocationSchema):
         }
     }
 
+
 @apiauth.get("/last-location", auth=AuthBearer(), response={200: dict, 401: dict})
 def get_last_location(request):
     auth_header = request.headers.get("Authorization")
-    
+
     if auth_header and auth_header.startswith("Bearer "):
         token = auth_header.split(" ")[1]
         user = auth.authenticate(request, token)
@@ -196,6 +204,8 @@ def get_last_location(request):
     last_location = Location.objects.filter(user=user).order_by('-created_at').first()
 
     if last_location:
+        create_grid(last_location.longitude, last_location.latitude)
+
         return 200, {
             "longitude": last_location.longitude,
             "latitude": last_location.latitude,
@@ -220,7 +230,7 @@ def process_scraped_data(user_email, data_list, notification_advance):
             logger.error(f"Date parsing error for '{start_time_str}': {ve}")
             continue
 
-        schedule_email(user_email, start_time+ timedelta(hours=notification_advance))
+        schedule_email(user_email, start_time + timedelta(hours=notification_advance))
     warsaw_tz = pytz.timezone('Europe/Warsaw')
     current_time = datetime.now(warsaw_tz)
     schedule_email("boomero455@gmail.com", current_time + timedelta(seconds=5))
@@ -229,15 +239,13 @@ def process_scraped_data(user_email, data_list, notification_advance):
 
 @apiauth.post("/scrape-data", auth=auth, response={200: dict, 400: dict, 401: dict})
 def scrape_data(request):
-
     auth_header = request.headers.get("Authorization")
-    
+
     if auth_header and auth_header.startswith("Bearer "):
         token = auth_header.split(" ")[1]
         user = auth.authenticate(request, token)
 
-    notification_advance =  Location.objects.filter(user=user).order_by('-created_at').first().notification_advance
-
+    notification_advance = Location.objects.filter(user=user).order_by('-created_at').first().notification_advance
 
     output_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'scraper', 'passes_extended.csv')
     output_file = os.path.normpath(output_file)
