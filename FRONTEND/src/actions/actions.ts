@@ -42,6 +42,7 @@ export const logoutAction = async () => {
 export const setLocationAction = async (body: {
   latitude: number;
   longitude: number;
+  notification_advance: number;
 }) => {
   const { data, error } = await api('auth/location', {
     method: 'POST',

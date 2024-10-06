@@ -132,6 +132,7 @@ const LocationModal = ({ location }: LocationModalProps) => {
   const onSubmit = async ({
     latitude,
     longitude,
+    timeForNotifications,
   }: TSelectLocationFormSchema) => {
     const newCords = [+latitude, +longitude] as L.LatLngExpression;
     setCoords(newCords);
@@ -143,6 +144,7 @@ const LocationModal = ({ location }: LocationModalProps) => {
     const { data, error } = await setLocationAction({
       latitude: +latitude,
       longitude: +longitude,
+      notification_advance: parseInt(timeForNotifications.match(/\d+/)![0]),
     });
 
     if (error) {

@@ -121,7 +121,7 @@ export const ComparisonTable = () => {
 
   return (
     <div className="rounded border p-5">
-      <div className="sm:flex justify-between items-center">
+      <div className="items-center justify-between sm:flex">
         <h3 className="mb-3 text-xl font-semibold tracking-tight">
           Landsat vs Earth Comparison
         </h3>
