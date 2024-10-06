@@ -204,7 +204,7 @@ def get_last_location(request):
     last_location = Location.objects.filter(user=user).order_by('-created_at').first()
 
 
-
+    if last_location:
         return 200, {
             "longitude": last_location.longitude,
             "latitude": last_location.latitude,
