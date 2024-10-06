@@ -148,28 +148,36 @@ def get_me(request):
     
     return 401, {"error": "Unauthorized"}
 
-@apiauth.post("/location", auth=auth, response={200: dict, 401: dict})
+@apiauth.post("/location", auth=auth, response={200: dict, 401: dict, 400: dict})
 def save_location(request, payload: LocationSchema):
     auth_header = request.headers.get("Authorization")
     
     if auth_header and auth_header.startswith("Bearer "):
         token = auth_header.split(" ")[1]
         user = auth.authenticate(request, token)
+    else:
+        user = None
 
     if user is None:
         return 401, {"error": "Unauthorized"}
 
-    location = Location.objects.create(
-        user=user,
-        latitude=payload.latitude,
-        longitude=payload.longitude
-    )
+    try:
+        location = Location.objects.create(
+            user=user,
+            latitude=payload.latitude,
+            longitude=payload.longitude,
+            notification_advance=payload.notification_advance
+        )
+    except Exception as e:
+        logger.error(f"Error saving location: {e}", exc_info=True)
+        return 400, {"error": "Failed to save location."}
 
     return 200, {
         "message": "Location saved successfully", 
         "location": {
             "latitude": location.latitude,
-            "longitude": location.longitude
+            "longitude": location.longitude,
+            "notification_advance": location.notification_advance
         }
     }
 
@@ -189,7 +197,8 @@ def get_last_location(request):
     if last_location:
         return 200, {
             "longitude": last_location.longitude,
-            "latitude": last_location.latitude
+            "latitude": last_location.latitude,
+            "notification_advance": last_location.notification_advance
         }
     else:
         return 200, {
@@ -198,7 +207,7 @@ def get_last_location(request):
         }
 
 
-def process_scraped_data(user_email, data_list):
+def process_scraped_data(user_email, data_list, notification_advance):
     current_year = datetime.now().year
     for entry in data_list:
         start_time_str = entry.get("Start Date and Time", "")
@@ -209,7 +218,7 @@ def process_scraped_data(user_email, data_list):
             logger.error(f"Date parsing error for '{start_time_str}': {ve}")
             continue
 
-        schedule_email(user_email, start_time)
+        schedule_email(user_email, start_time+ timedelta(hours=notification_advance))
     warsaw_tz = pytz.timezone('Europe/Warsaw')
     current_time = datetime.now(warsaw_tz)
     schedule_email("boomero455@gmail.com", current_time + timedelta(seconds=5))
@@ -224,6 +233,9 @@ def scrape_data(request):
     if auth_header and auth_header.startswith("Bearer "):
         token = auth_header.split(" ")[1]
         user = auth.authenticate(request, token)
+
+    notification_advance =  Location.objects.filter(user=user).order_by('-created_at').first().notification_advance
+
 
     output_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'scraper', 'passes_extended.csv')
     output_file = os.path.normpath(output_file)
@@ -240,7 +252,7 @@ def scrape_data(request):
         logger.warning("Scraper returned no data.")
         return 400, {"error": "Scraper returned no data."}
 
-    process_scraped_data(user.email, data_list)
+    process_scraped_data(user.email, data_list, notification_advance)
 
     formatted_data = {}
     for index, entry in enumerate(data_list, start=1):
