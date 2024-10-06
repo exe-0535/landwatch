@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -7,6 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Slider } from '@/components/ui/slider';
+import { useState } from 'react';
 
 const tableData = [
   {
@@ -57,49 +61,83 @@ const tableData = [
 ];
 
 export const LandsatTable = () => {
+  const [maxCloudCover, setMaxCloudCover] = useState(15);
+
+  const filteredData = tableData.filter(
+    (row) => parseInt(row.cloudCover) <= maxCloudCover
+  );
+
   return (
     <div className="rounded border p-5">
       <h3 className="mb-3 text-xl font-semibold tracking-tight">
         Landsat Data
       </h3>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="font-medium">Landsat</TableHead>
-            <TableHead>Date & time</TableHead>
-            <TableHead>Latitude/Longitude</TableHead>
-            <TableHead>WRS</TableHead>
-            <TableHead>Cloud cover</TableHead>
-            <TableHead>Image quality</TableHead>
-            <TableHead className="text-right">Download CSV</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {tableData.map(
-            ({
-              id,
-              landsat,
-              dateTime,
-              latLong,
-              wrs,
-              cloudCover,
-              imageQuality,
-            }) => (
-              <TableRow key={id}>
-                <TableCell className="font-medium">{landsat}</TableCell>
-                <TableCell>{dateTime}</TableCell>
-                <TableCell>{latLong}</TableCell>
-                <TableCell>{wrs}</TableCell>
-                <TableCell>{cloudCover}</TableCell>
-                <TableCell>{imageQuality}</TableCell>
-                <TableCell className="text-right">
-                  <Button variant="outline">Download</Button>
-                </TableCell>
-              </TableRow>
-            )
-          )}
-        </TableBody>
-      </Table>
+      <div className="mb-4">
+        <label
+          htmlFor="cloud-cover-filter"
+          className="text-muted-foreground mb-2 block text-sm font-medium"
+        >
+          Max Cloud Cover: {maxCloudCover}%
+        </label>
+        <Slider
+          id="cloud-cover-filter"
+          min={0}
+          max={100}
+          step={1}
+          value={[maxCloudCover]}
+          onValueChange={(value) => setMaxCloudCover(value[0])}
+          className="w-full"
+        />
+      </div>
+      {filteredData.length ? (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="font-medium">Landsat</TableHead>
+              <TableHead>Date & time</TableHead>
+              <TableHead>Latitude/Longitude</TableHead>
+              <TableHead>WRS</TableHead>
+              <TableHead>Cloud cover</TableHead>
+              <TableHead>Image quality</TableHead>
+              <TableHead className="text-right">Download CSV</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredData.map(
+              ({
+                id,
+                landsat,
+                dateTime,
+                latLong,
+                wrs,
+                cloudCover,
+                imageQuality,
+              }) => (
+                <TableRow key={id}>
+                  <TableCell className="font-medium">{landsat}</TableCell>
+                  <TableCell>{dateTime}</TableCell>
+                  <TableCell>{latLong}</TableCell>
+                  <TableCell>{wrs}</TableCell>
+                  <TableCell>{cloudCover}</TableCell>
+                  <TableCell>{imageQuality}</TableCell>
+                  <TableCell className="text-right">
+                    <Button variant="outline">Download</Button>
+                  </TableCell>
+                </TableRow>
+              )
+            )}
+          </TableBody>
+        </Table>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-10">
+          <h4 className="text-xl font-semibold tracking-tight">
+            No data to show
+          </h4>
+          <p className="text-muted-foreground">
+            Change your filters to show data
+          </p>
+        </div>
+      )}
     </div>
   );
 };

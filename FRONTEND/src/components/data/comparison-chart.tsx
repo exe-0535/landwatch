@@ -38,7 +38,7 @@ const chartConfig = {
 
 export function ComparisonChart() {
   return (
-    <div className="mt-8 lg:flex gap-5">
+    <div className="mt-8 gap-5 lg:flex">
       <ChartContainer className="lg:w-1/2" config={chartConfig}>
         <BarChart accessibilityLayer data={chartData1}>
           <CartesianGrid vertical={false} />

@@ -1,5 +1,6 @@
 import { ComparisonChart } from './comparison-chart';
 
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -9,7 +10,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
 
 const landsatData = [
   {
