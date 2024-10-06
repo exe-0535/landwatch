@@ -20,7 +20,7 @@ from smtp.utils import send_notification_email
 from datetime import datetime, timedelta, timezone as tz
 from django.utils import timezone
 from .scheduler import scheduler
-from grid_converter.utils import create_grid
+
 
 apiauth = NinjaAPI(version="1.0")
 data = NinjaAPI(version="2.0")
@@ -203,8 +203,7 @@ def get_last_location(request):
 
     last_location = Location.objects.filter(user=user).order_by('-created_at').first()
 
-    if last_location:
-        create_grid(last_location.longitude, last_location.latitude)
+
 
         return 200, {
             "longitude": last_location.longitude,
@@ -274,3 +273,56 @@ def scrape_data(request):
     logger.debug("Data formatted successfully.")
 
     return 200, {"data": formatted_data}
+
+
+
+
+import os
+from django.conf import settings
+
+@data.get("/get-landsat-data", auth=auth, response={200: dict, 404: dict, 500: dict})
+def get_landsat_data(request):
+    base_dir = getattr(settings, 'LANDSAT_DATA_DIR', os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'ls_data', 'temperature'))
+
+    file_name = 'LC08_L2SP_186025_20240924_20240928_02_T1_MTL.txt'
+    file_path = os.path.normpath(os.path.join(base_dir, file_name))
+    
+    logger.debug(f"Looking for Landsat file at: {file_path}")
+    
+    landsat_data = {
+        "WRS_PATH": None,
+        "WRS_ROW": None,
+        "DATE_ACQUIRED": None,
+        "SCENE_CENTER_TIME": None,
+        "CLOUD_COVER": None,
+        "IMAGE_QUALITY_TIRS": None,
+        "SPACECRAFT_ID": None
+    }
+
+    try:
+        with open(file_path, 'r') as file:
+            for line in file:
+                if "WRS_PATH" in line:
+                    landsat_data["WRS_PATH"] = line.split('=')[1].strip().strip('"')
+                elif "WRS_ROW" in line:
+                    landsat_data["WRS_ROW"] = line.split('=')[1].strip().strip('"')
+                elif "DATE_ACQUIRED" in line:
+                    landsat_data["DATE_ACQUIRED"] = line.split('=')[1].strip().strip('"')
+                elif "SCENE_CENTER_TIME" in line:
+                    landsat_data["SCENE_CENTER_TIME"] = line.split('=')[1].strip().strip('"').split(".")[0]
+                elif "CLOUD_COVER" in line:
+                    landsat_data["CLOUD_COVER"] = line.split('=')[1].strip().strip('"')
+                elif "IMAGE_QUALITY_TIRS" in line:
+                    landsat_data["IMAGE_QUALITY_TIRS"] = line.split('=')[1].strip().strip('"')
+                elif "SPACECRAFT_ID" in line:
+                    landsat_data["SPACECRAFT_ID"] = line.split("=")[1].strip().strip('"').split("_")[0] + " " + line.split("=")[1].strip().strip('"').split("_")[1]
+                    
+        return 200, landsat_data
+
+    except FileNotFoundError:
+        logger.error(f"File not found at path: {file_path}")
+        return 404, {"error": f"File not found at path: {file_path}"}
+    except Exception as e:
+        logger.error(f"An error occurred: {str(e)}")
+        return 500, {"error": str(e)}
+
